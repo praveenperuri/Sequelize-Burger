@@ -2,41 +2,57 @@ var express = require("express");
 
 var router = express.Router();
 
-var burger = require("../models/burger.js");
+var db = require("../models");
 
 // Create all our routes and set up logic within those routes where required.
 router.get("/", function (req, res) {
-    burger.all(function (data) {
+    db.burger.findAll({}).then(function(result){
         var burgerObject = {
-            burgers: data
+            burgers: result
         };
         console.log(burgerObject);
         res.render("index", burgerObject);
     });
+
 });
 
 router.post("/", function (req, res) {
     console.log(req.body.name);
     console.log(req.body.devoured);
 
-    burger.create(req.body.name, req.body.devoured, function () {
+    db.burger.create({
+        burger_name: req.body.name,
+        devoured: req.body.devoured
+      }).then(function(result){
         res.redirect("/");
-    });
+      });
+        
 });
 
 router.put("/:id", function (req, res) {
 
-    burger.update("devoured", 1, "id", req.params.id, function () {
+    db.burger.update({
+        devoured: 1
+      }, {
+        where: {
+          id: req.params.id
+        }
+      }).then(function(result){
         res.redirect("/");
     });
+    
+
 });
 
 router.delete("/:id", function (req, res) {
 
-    burger.delete("id", req.params.id, function () {
+    db.burger.destroy({
+        where: {
+          id: req.params.id
+        }
+      }).then(function(result) {
         res.redirect("/");
-    });
-
+      });
 
 });
 
